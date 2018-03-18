@@ -62,6 +62,7 @@ struct H264Reader{
 
     // 读取一个nalu
     bool ReadNalu(uint8_t *nal, int *len);
+    bool ReadNaluWithStartCode(uint8_t *nal, int *len);
     bool ReadNalu(h264_nalu* nal);
 private:
     int ReadDataFromFile();

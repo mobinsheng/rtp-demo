@@ -43,12 +43,34 @@ bool H264Reader::ReadNalu(uint8_t *nal, int *len){
     return true;
 }
 
+bool H264Reader::ReadNaluWithStartCode(uint8_t *nal, int *len){
+    h264_nalu nalu;
+    bool ret = ReadNalu(&nalu);
+    if(ret == false){
+        return false;
+    }
+    if(nalu.start_code_len == 3){
+        nal[0] = 0;nal[1] = 0;
+        nal[2] = 1;
+    }
+    else{
+        nal[0] = 0;nal[1] = 0;
+        nal[2] = 0;nal[3] = 1;
+    }
+    *len = nalu.nal_len + nalu.start_code_len;
+    memcpy(nal + nalu.start_code_len,nalu.buf,nalu.nal_len);
+    return true;
+}
+
 bool H264Reader::ReadNalu(h264_nalu *nalu){
     bool eof = true;
 
     while (true) {
         if(ReadDataFromFile()){
             eof = false;
+        }
+        else{
+            eof = true;
         }
 
         size_t dataLen = end - start;
